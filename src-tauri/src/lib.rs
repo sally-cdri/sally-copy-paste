@@ -442,6 +442,18 @@ fn paste_clip(id: String, state: tauri::State<History>, prev_app: tauri::State<P
     }
 }
 
+#[tauri::command]
+fn clip_image_b64(id: String, state: tauri::State<History>) -> Option<String> {
+    use base64::Engine as _;
+    let guard = state.0.lock().unwrap();
+    let item = guard.iter().find(|i| i.id == id).cloned();
+    drop(guard);
+    let item = item?;
+    let path = item.image_path?;
+    let bytes = std::fs::read(&path).ok()?;
+    Some(base64::engine::general_purpose::STANDARD.encode(&bytes))
+}
+
 /// 기존 paste_selected: React 코드가 아직 이를 호출하므로 유지
 #[tauri::command]
 fn paste_selected(state: tauri::State<PrevApp>) {
@@ -531,6 +543,7 @@ pub fn run() {
             get_history,
             clear_history,
             paste_clip,
+            clip_image_b64,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -1,6 +1,6 @@
-# sally-copy-paste
+# SallyCopyPaste
 
-macOS 클립보드 매니저 — 복사 기록(텍스트·이미지)을 Cmd+Shift+V로 띄워 골라 붙여넣기.
+macOS 클립보드 매니저 — 복사 기록(텍스트·이미지·파일)을 Cmd+Shift+V로 띄워 골라 붙여넣기.
 
 ## 개발 실행
 ```bash

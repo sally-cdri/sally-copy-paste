@@ -567,7 +567,7 @@ pub fn run() {
                 TrayIconBuilder::with_id("main-tray")
                     .icon(tray_img)
                     .icon_as_template(true)
-                    .tooltip("sally-copy-paste")
+                    .tooltip("SallyCopyPaste")
                     .menu(&menu)
                     .show_menu_on_left_click(false)
                     .on_menu_event(|app, event| {

@@ -50,7 +50,7 @@ git push origin HEAD
 echo "▶ 유니버설 빌드 중… (몇 분 소요)"
 npm run tauri build -- --target universal-apple-darwin
 
-DMG="src-tauri/target/universal-apple-darwin/release/bundle/dmg/sally-copy-paste_${VERSION}_universal.dmg"
+DMG="src-tauri/target/universal-apple-darwin/release/bundle/dmg/SallyCopyPaste_${VERSION}_universal.dmg"
 if [[ ! -f "$DMG" ]]; then
   echo "dmg 를 찾지 못했습니다: $DMG" >&2
   exit 1
@@ -66,9 +66,9 @@ cat > "$NOTES_FILE" <<EOF
 ${NOTE:-- (변경 내용)}
 
 ## 설치
-1. 아래 \`sally-copy-paste_${VERSION}_universal.dmg\` 다운로드 → 앱을 응용 프로그램으로 드래그
+1. 아래 \`SallyCopyPaste_${VERSION}_universal.dmg\` 다운로드 → 앱을 응용 프로그램으로 드래그
 2. 첫 실행: **앱 우클릭 → 열기**(서명 안 된 앱이라 더블클릭은 막힘). 안 되면 터미널:
-   \`xattr -dr com.apple.quarantine /Applications/sally-copy-paste.app\`
+   \`xattr -dr com.apple.quarantine /Applications/SallyCopyPaste.app\`
 3. 시스템 설정 → 개인정보 보호 및 보안 → **손쉬운 사용**에서 켜기
 
 ## 사용
@@ -78,6 +78,6 @@ ${NOTE:-- (변경 내용)}
 - 종료: 메뉴바 아이콘 우클릭 → 종료
 EOF
 
-gh release create "$TAG" "$DMG" --title "sally-copy-paste $TAG" --notes-file "$NOTES_FILE"
+gh release create "$TAG" "$DMG" --title "SallyCopyPaste $TAG" --notes-file "$NOTES_FILE"
 echo "✅ 완료: $(gh release view "$TAG" --json url --jq .url)"
 echo "   공유 링크: https://github.com/sally-cdri/sally-copy-paste/releases/latest"

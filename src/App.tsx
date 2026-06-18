@@ -15,6 +15,7 @@ export default function App() {
   const itemsRef = useRef<ClipItem[]>([])
   itemsRef.current = items
   const inputRef = useRef<HTMLInputElement>(null)
+  const selRowRef = useRef<HTMLLIElement>(null)
 
   const win = useMemo(() => getCurrentWindow(), [])
 
@@ -127,6 +128,11 @@ export default function App() {
     })
   }, [items, thumbs])
 
+  // 화살표 이동 시 선택 항목이 보이도록 자동 스크롤
+  useEffect(() => {
+    selRowRef.current?.scrollIntoView({ block: 'nearest' })
+  }, [sel, query, items])
+
   async function remove(id: string, shownLen: number) {
     await invoke('delete_clip', { id })
     await fetchHistory()
@@ -164,7 +170,12 @@ export default function App() {
           <li className="empty">기록이 없습니다</li>
         ) : (
           shown.map((it, i) => (
-            <li key={it.id} className={`row ${i === sel ? 'is-sel' : ''}`} onClick={() => void choose(it)}>
+            <li
+              key={it.id}
+              ref={i === sel ? selRowRef : null}
+              className={`row ${i === sel ? 'is-sel' : ''}`}
+              onClick={() => void choose(it)}
+            >
               {it.kind === 'image' && thumbs[it.id] ? (
                 <img className="thumb" src={`data:image/png;base64,${thumbs[it.id]}`} alt="" />
               ) : it.kind === 'image' ? (

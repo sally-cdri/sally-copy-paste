@@ -1,0 +1,9 @@
+:root { font-family: -apple-system, 'Apple SD Gothic Neo', sans-serif; }
+html, body, #root { height: 100%; margin: 0; }
+.picker { height: 100%; display: flex; flex-direction: column; background: rgba(30,30,32,0.96); color: #f2f2f2; border-radius: 12px; overflow: hidden; }
+.search { border: none; outline: none; padding: 12px 14px; font-size: 15px; background: transparent; color: inherit; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.list { flex: 1; overflow-y: auto; list-style: none; margin: 0; padding: 6px; }
+.row { padding: 8px 10px; border-radius: 8px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.row.is-sel { background: #3b6ea5; }
+.thumb { max-height: 48px; border-radius: 4px; display: block; }
+.empty { padding: 20px; text-align: center; color: #999; }

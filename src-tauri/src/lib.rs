@@ -556,6 +556,49 @@ pub fn run() {
             #[cfg(target_os = "macos")]
             start_clipboard_monitor(app.handle().clone());
 
+            // 메뉴바 트레이 아이콘 (좌클릭=팝업 표시, 우클릭=메뉴/종료)
+            {
+                use tauri::menu::{MenuBuilder, MenuItemBuilder};
+                use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
+
+                let quit = MenuItemBuilder::with_id("quit", "종료").build(app)?;
+                let menu = MenuBuilder::new(app).item(&quit).build()?;
+                let tray_img = tauri::image::Image::from_bytes(include_bytes!("../icons/tray.png"))?;
+
+                TrayIconBuilder::with_id("main-tray")
+                    .icon(tray_img)
+                    .icon_as_template(true)
+                    .tooltip("sally-copy-paste")
+                    .menu(&menu)
+                    .show_menu_on_left_click(false)
+                    .on_menu_event(|app, event| {
+                        if event.id() == "quit" {
+                            app.exit(0);
+                        }
+                    })
+                    .on_tray_icon_event(|tray, event| {
+                        if let TrayIconEvent::Click {
+                            button: MouseButton::Left,
+                            button_state: MouseButtonState::Up,
+                            ..
+                        } = event
+                        {
+                            let app = tray.app_handle();
+                            #[cfg(target_os = "macos")]
+                            {
+                                let pid = frontmost_pid();
+                                *app.state::<PrevApp>().0.lock().unwrap() = pid;
+                            }
+                            if let Some(w) = app.get_webview_window("popup") {
+                                let _ = w.show();
+                                let _ = w.set_focus();
+                                let _ = w.emit("popup-shown", ());
+                            }
+                        }
+                    })
+                    .build(app)?;
+            }
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![

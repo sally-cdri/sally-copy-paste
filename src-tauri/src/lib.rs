@@ -427,22 +427,21 @@ fn paste_clip(id: String, state: tauri::State<History>, prev_app: tauri::State<P
                 }
                 "files" => {
                     if let Some(ref paths) = item.files {
-                        use objc2::rc::Retained;
-                        use objc2::runtime::ProtocolObject;
-                        use objc2_app_kit::NSPasteboardWriting;
-                        use objc2_foundation::{NSArray, NSURL};
-                        // 모든 파일 URL을 한 번의 writeObjects로 기록(Finder가 인식하는 표준 방식)
-                        let objs: Vec<Retained<ProtocolObject<dyn NSPasteboardWriting>>> = paths
-                            .iter()
-                            .map(|path| {
-                                let ns_str = NSString::from_str(path);
-                                let url = NSURL::fileURLWithPath(&ns_str);
-                                ProtocolObject::from_retained(url)
-                            })
-                            .collect();
-                        if !objs.is_empty() {
-                            let arr = NSArray::from_retained_slice(&objs);
-                            pb.writeObjects(&arr);
+                        if !paths.is_empty() {
+                            use objc2::rc::Retained;
+                            use objc2_foundation::NSArray;
+                            // 레거시 NSFilenamesPboardType: 경로 배열을 실데이터로 기록.
+                            // Finder를 포함한 대부분의 앱이 이 형식을 붙여넣기로 인식하며,
+                            // (writeObjects 방식과 달리) 앱/객체 수명과 무관하게 클립보드에 지속됨.
+                            let type_ns = NSString::from_str("NSFilenamesPboardType");
+                            let types = NSArray::from_retained_slice(&[type_ns.clone()]);
+                            let path_objs: Vec<Retained<NSString>> =
+                                paths.iter().map(|p| NSString::from_str(p)).collect();
+                            let plist = NSArray::from_retained_slice(&path_objs);
+                            unsafe {
+                                pb.declareTypes_owner(&types, None);
+                                pb.setPropertyList_forType(&plist, &type_ns);
+                            }
                         }
                     }
                 }

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <rect x="0" y="0" width="1024" height="1024" rx="230" ry="230" fill="#2F6BE0"/>
+  <!-- 클립보드 보드 -->
+  <rect x="300" y="258" width="424" height="556" rx="46" fill="#ffffff"/>
+  <!-- 상단 클립(집게) -->
+  <rect x="430" y="196" width="164" height="132" rx="36" fill="#ffffff"/>
+  <rect x="466" y="156" width="92" height="86" rx="26" fill="#2F6BE0"/>
+  <rect x="486" y="176" width="52" height="48" rx="16" fill="#ffffff"/>
+  <!-- 텍스트 줄 (배경색이 보드를 파고들어 글자처럼) -->
+  <g fill="#2F6BE0">
+    <rect x="372" y="430" width="280" height="34" rx="17"/>
+    <rect x="372" y="512" width="280" height="34" rx="17"/>
+    <rect x="372" y="594" width="190" height="34" rx="17"/>
+  </g>
+</svg>

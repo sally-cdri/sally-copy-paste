@@ -11,6 +11,7 @@ export default function App() {
   const [query, setQuery] = useState('')
   const [sel, setSel] = useState(0)
   const [thumbs, setThumbs] = useState<Record<string, string>>({})
+  const [toast, setToast] = useState(false)
   const itemsRef = useRef<ClipItem[]>([])
   itemsRef.current = items
   const inputRef = useRef<HTMLInputElement>(null)
@@ -59,6 +60,7 @@ export default function App() {
     void win.listen('popup-shown', () => {
       setQuery('')
       setSel(0)
+      setToast(false)
       void fetchHistory()
       inputRef.current?.focus()
     }).then((fn) => {
@@ -117,6 +119,10 @@ export default function App() {
 
   async function choose(it: ClipItem | undefined) {
     if (!it) return
+    // 앱 내에서 "복사되었습니다" 토스트를 잠깐 보여준 뒤 닫고 붙여넣기
+    setToast(true)
+    await new Promise((r) => setTimeout(r, 800))
+    setToast(false)
     await win.hide()
     await invoke('paste_clip', { id: it.id })
   }
@@ -152,6 +158,7 @@ export default function App() {
           ))
         )}
       </ul>
+      {toast && <div className="toast">복사되었습니다</div>}
     </main>
   )
 }

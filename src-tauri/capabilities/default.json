@@ -5,6 +5,7 @@
   "windows": ["popup"],
   "permissions": [
     "core:default",
+    "core:window:allow-hide",
     "opener:default",
     "global-shortcut:allow-register",
     "global-shortcut:allow-unregister",

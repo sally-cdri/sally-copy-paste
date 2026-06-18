@@ -8,17 +8,6 @@
     "opener:default",
     "global-shortcut:allow-register",
     "global-shortcut:allow-unregister",
-    "global-shortcut:allow-is-registered",
-    "fs:default",
-    "fs:allow-app-write",
-    "fs:allow-app-read",
-    "clipboard:allow-start-monitor",
-    "clipboard:allow-stop-monitor",
-    "clipboard:allow-read-text",
-    "clipboard:allow-read-image-base64",
-    "clipboard:allow-write-text",
-    "clipboard:allow-write-image-base64",
-    "clipboard:allow-has-text",
-    "clipboard:allow-has-image"
+    "global-shortcut:allow-is-registered"
   ]
 }

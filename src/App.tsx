@@ -144,6 +144,7 @@ export default function App() {
   }
 
   const shown = filterClips(items, query)
+  const selected = shown[sel]
 
   return (
     <main className="picker">
@@ -177,6 +178,21 @@ export default function App() {
           ))
         )}
       </ul>
+      <div className="preview">
+        {!selected ? (
+          <span className="ph">선택된 항목이 없습니다</span>
+        ) : selected.kind === 'image' ? (
+          thumbs[selected.id] ? (
+            <img src={`data:image/png;base64,${thumbs[selected.id]}`} alt="" />
+          ) : (
+            <span className="ph">[이미지]</span>
+          )
+        ) : selected.kind === 'files' ? (
+          (selected.files ?? []).join('\n')
+        ) : (
+          selected.text || selected.preview
+        )}
+      </div>
       {toast && <div className="toast">복사되었습니다</div>}
     </main>
   )

@@ -147,6 +147,9 @@ export default function App() {
 
   return (
     <main className="picker">
+      <div className="dragbar" data-tauri-drag-region>
+        <span className="grip" />
+      </div>
       <input
         ref={inputRef}
         className="search"

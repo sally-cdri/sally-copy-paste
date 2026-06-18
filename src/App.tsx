@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback } from 'react'
+import { useEffect, useState, useRef, useCallback, useMemo } from 'react'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { addClip, filterClips } from './core/history'
 import type { ClipItem } from './core/types'
@@ -51,17 +51,23 @@ export default function App() {
     })()
   }, [push])
 
-  const win = getCurrentWindow()
+  // 동일 창 핸들을 메모이즈 — 렌더마다 Tauri 리스너 재등록 방지
+  const win = useMemo(() => getCurrentWindow(), [])
 
-  // 창 표시될 때 검색 초기화 + 선택 0
+  // 창 표시될 때 검색 초기화 + 선택 0 (1회 등록)
   useEffect(() => {
     const un = win.listen('popup-shown', () => { setQuery(''); setSel(0) })
     return () => { void un.then((f) => f()) }
   }, [win])
 
-  // blur/Esc 시 숨김
+  // blur 시 숨김 (Tauri 리스너 — 1회 등록)
   useEffect(() => {
     const unFocus = win.onFocusChanged(({ payload: focused }) => { if (!focused) void win.hide() })
+    return () => { void unFocus.then((f) => f()) }
+  }, [win])
+
+  // 키보드 탐색 (DOM 전용 — 최신 query/sel 클로저를 위해 매 렌더 재등록)
+  useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const shown = filterClips(itemsRef.current, query)
       if (e.key === 'Escape') void win.hide()
@@ -70,7 +76,7 @@ export default function App() {
       else if (e.key === 'Enter') { e.preventDefault(); void choose(shown[sel]) }
     }
     window.addEventListener('keydown', onKey)
-    return () => { void unFocus.then((f) => f()); window.removeEventListener('keydown', onKey) }
+    return () => { window.removeEventListener('keydown', onKey) }
   })
 
   // 이미지 썸네일 lazy 로드

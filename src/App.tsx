@@ -31,15 +31,17 @@ export default function App() {
 
   // 부트스트랩: 기존 기록 로드 + 모니터 시작 + 구독
   useEffect(() => {
+    let cancelled = false
+    const cleanups: Array<() => void> = []
     void (async () => {
       setItems(await loadHistory())
       if (!(await accessibilityOk())) void promptAccessibility()
-      await startClipboardMonitor()
-      await onText((text) => {
+      const stop = await startClipboardMonitor()
+      const unText = await onText((text) => {
         if (!text) return
         push({ id: newId(), type: 'text', dedupKey: text, text, preview: text.slice(0, 200), createdAt: Date.now() })
       })
-      await onImage(async (b64) => {
+      const unImage = await onImage(async (b64) => {
         const id = newId()
         try {
           const path = await saveImagePng(id, b64)
@@ -48,7 +50,17 @@ export default function App() {
           /* 저장 실패 무시 */
         }
       })
+      // StrictMode 등으로 이미 정리됐으면 즉시 해제, 아니면 cleanup에 등록(이중 구독 방지)
+      if (cancelled) {
+        stop(); unText(); unImage()
+      } else {
+        cleanups.push(stop, unText, unImage)
+      }
     })()
+    return () => {
+      cancelled = true
+      cleanups.forEach((f) => f())
+    }
   }, [push])
 
   // 동일 창 핸들을 메모이즈 — 렌더마다 Tauri 리스너 재등록 방지
@@ -93,7 +105,8 @@ export default function App() {
     if (it.type === 'text' && it.text != null) await writeClipboardText(it.text)
     else if (it.type === 'image' && it.imagePath) {
       const url = thumbs[it.id] ?? (await readImageDataUrl(it.imagePath))
-      await writeClipboardImage(url.split(',')[1])
+      const b64 = url.split(',')[1]
+      if (b64) await writeClipboardImage(b64)
     }
     await win.hide()
     await pasteSelected()

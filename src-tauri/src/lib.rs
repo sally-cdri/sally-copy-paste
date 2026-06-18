@@ -415,12 +415,22 @@ fn paste_clip(id: String, state: tauri::State<History>, prev_app: tauri::State<P
                 }
                 "files" => {
                     if let Some(ref paths) = item.files {
-                        use objc2_app_kit::NSURLNSPasteboardSupport;
-                        use objc2_foundation::NSURL;
-                        for path in paths {
-                            let ns_str = NSString::from_str(path);
-                            let url = NSURL::fileURLWithPath(&ns_str);
-                            url.writeToPasteboard(&pb);
+                        use objc2::rc::Retained;
+                        use objc2::runtime::ProtocolObject;
+                        use objc2_app_kit::NSPasteboardWriting;
+                        use objc2_foundation::{NSArray, NSURL};
+                        // 모든 파일 URL을 한 번의 writeObjects로 기록(Finder가 인식하는 표준 방식)
+                        let objs: Vec<Retained<ProtocolObject<dyn NSPasteboardWriting>>> = paths
+                            .iter()
+                            .map(|path| {
+                                let ns_str = NSString::from_str(path);
+                                let url = NSURL::fileURLWithPath(&ns_str);
+                                ProtocolObject::from_retained(url)
+                            })
+                            .collect();
+                        if !objs.is_empty() {
+                            let arr = NSArray::from_retained_slice(&objs);
+                            pb.writeObjects(&arr);
                         }
                     }
                 }

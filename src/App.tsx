@@ -6,6 +6,32 @@ import type { ClipItem } from './core/types'
 import { accessibilityOk, promptAccessibility } from './app/paste'
 import './App.css'
 
+function KindIcon({ kind }: { kind: ClipItem['kind'] }) {
+  if (kind === 'image') {
+    return (
+      <svg className="kicon" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="2.5" y="3" width="11" height="10" rx="1.5" />
+        <circle cx="6" cy="6.3" r="1.1" />
+        <path d="M3 12l3.3-3.2 2.4 2.3 2-1.8 2.3 2.4" />
+      </svg>
+    )
+  }
+  if (kind === 'files') {
+    return (
+      <svg className="kicon" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M2.6 5.2a1 1 0 0 1 1-1h2.6l1.2 1.4h5a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1h-9a1 1 0 0 1-1-1z" />
+      </svg>
+    )
+  }
+  return (
+    <svg className="kicon" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="3" y1="4.5" x2="13" y2="4.5" />
+      <line x1="3" y1="8" x2="13" y2="8" />
+      <line x1="3" y1="11.5" x2="10" y2="11.5" />
+    </svg>
+  )
+}
+
 export default function App() {
   const [items, setItems] = useState<ClipItem[]>([])
   const [query, setQuery] = useState('')
@@ -176,12 +202,9 @@ export default function App() {
               className={`row ${i === sel ? 'is-sel' : ''}`}
               onClick={() => void choose(it)}
             >
+              <KindIcon kind={it.kind} />
               {it.kind === 'image' && thumbs[it.id] ? (
                 <img className="thumb" src={`data:image/png;base64,${thumbs[it.id]}`} alt="" />
-              ) : it.kind === 'image' ? (
-                <span className="text">{it.preview}</span>
-              ) : it.kind === 'files' ? (
-                <span className="text">{it.preview}</span>
               ) : (
                 <span className="text">{it.preview || it.text}</span>
               )}

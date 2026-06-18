@@ -100,6 +100,16 @@ export default function App() {
       } else if (e.key === 'Enter') {
         e.preventDefault()
         void choose(shown[sel])
+      } else if (
+        (e.key === 'Backspace' || e.key === 'Delete') &&
+        (e.metaKey || query === '')
+      ) {
+        // 검색어가 비어 있거나 Cmd 조합일 때만 항목 삭제(검색 글자 삭제와 충돌 방지)
+        const target = shown[sel]
+        if (target) {
+          e.preventDefault()
+          void remove(target.id, shown.length)
+        }
       }
     }
     window.addEventListener('keydown', onKey)
@@ -116,6 +126,12 @@ export default function App() {
       }
     })
   }, [items, thumbs])
+
+  async function remove(id: string, shownLen: number) {
+    await invoke('delete_clip', { id })
+    await fetchHistory()
+    setSel((s) => Math.min(s, Math.max(0, shownLen - 2)))
+  }
 
   async function choose(it: ClipItem | undefined) {
     if (!it) return

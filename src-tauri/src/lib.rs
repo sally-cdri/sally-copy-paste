@@ -380,6 +380,18 @@ fn clear_history(state: tauri::State<History>, dirs: tauri::State<AppDirs>) {
 }
 
 #[tauri::command]
+fn delete_clip(id: String, state: tauri::State<History>, dirs: tauri::State<AppDirs>) {
+    let mut guard = state.0.lock().unwrap();
+    if let Some(pos) = guard.iter().position(|i| i.id == id) {
+        let item = guard.remove(pos);
+        if let Some(ref path) = item.image_path {
+            let _ = std::fs::remove_file(path);
+        }
+        persist_history(&dirs.history_path, &guard);
+    }
+}
+
+#[tauri::command]
 fn paste_clip(id: String, state: tauri::State<History>, prev_app: tauri::State<PrevApp>) {
     #[cfg(target_os = "macos")]
     {
@@ -552,6 +564,7 @@ pub fn run() {
             paste_selected,
             get_history,
             clear_history,
+            delete_clip,
             paste_clip,
             clip_image_b64,
         ])
